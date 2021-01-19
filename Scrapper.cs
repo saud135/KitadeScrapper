@@ -14,42 +14,50 @@ namespace KitadeScrapper
 {
     class Scrapper
     {
+       
         static ScrapingBrowser _browser = new ScrapingBrowser();
         static string mainUrl = ("https://www.kita.de/");
         public Scrapper()
         {
-            var _mainLinks = GetMainPageLinks(mainUrl, "ol.states_germany li a");
-
-            var _citiesLink = new List<string>();
-            var _schoolLinks = new List<string>();
-            var _schoolDetail = new List<SchoolDetails>();
-            foreach (var link in _mainLinks)
+            try
             {
-                var citiesInOtherPages = GetPages(link, "ol.pagination_char li a");
-
-                foreach (var currentPage in citiesInOtherPages)
+                var _mainLinks = GetMainPageLinks(mainUrl, "ol.states_germany li a");
+                var _citiesLink = new List<string>();
+                var _schoolLinks = new List<string>();
+                var _schoolDetail = new List<SchoolDetails>();
+                foreach (var link in _mainLinks)
                 {
-                    var citiesLink = GetMainPageLinks(currentPage, "ol.cities li a");
-                    _citiesLink.AddRange(citiesLink);
-                    Console.WriteLine(link.ToString());
-                }
-            }
+                    var citiesInOtherPages = GetPages(link, "ol.pagination_char li a"); //scrape all the cities in later pages of a district
 
-            foreach (var link in _citiesLink)
+                    foreach (var currentPage in citiesInOtherPages)
+                    {
+                        var citiesLink = GetMainPageLinks(currentPage, "ol.cities li a");
+                        _citiesLink.AddRange(citiesLink);
+                        Console.WriteLine(link.ToString());
+                    }
+                }
+
+                foreach (var link in _citiesLink)
+                {
+                    var schoolInOtherPages = GetPages(link, "ul.pagination li a"); // to get schools from all the pages in specfic city
+
+                    foreach (var currentPage in schoolInOtherPages)
+                    {
+                        var schoolLink = GetMainPageLinks(currentPage, "h3 a ");
+                        _schoolLinks.AddRange(schoolLink);
+                        var schoolDet = SchoolDetails.GetPageDetails(schoolLink);
+                        _schoolDetail.AddRange(schoolDet);
+                        var exportDataToCSV1 = new ExportDataToCSV(_schoolDetail);
+                        Console.WriteLine(link.ToString());
+                    }
+                }
+
+                var exportDataToCSV = new ExportDataToCSV(_schoolDetail);
+            }
+            catch(Exception e)
             {
-                var citiesInOtherPages = GetPages(link, "ol.pagination li a");
-
-                foreach (var currentPage in citiesInOtherPages)
-                {
-                    var schoolLink = GetMainPageLinks(link, "h3 a ");
-                    _schoolLinks.AddRange(schoolLink);
-                    var schoolDet = SchoolDetails.GetPageDetails(schoolLink);
-                    _schoolDetail.AddRange(schoolDet);
-                    Console.WriteLine(link.ToString());
-                }
+                Console.WriteLine(e.ToString());
             }
-            
-            var exportDataToCSV = new ExportDataToCSV(_schoolDetail);
         }
         
         static List<String> GetPages(string url, string queryExpression)
@@ -65,7 +73,6 @@ namespace KitadeScrapper
                 if (link.Attributes["href"] != null)
                     homePageLinks.Add(mainUrl + link.Attributes["href"].Value);
             }
-          
             return homePageLinks.ToList();
         }
         static List<string> GetMainPageLinks(string url, string queryExpression)
