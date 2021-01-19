@@ -17,6 +17,7 @@ namespace KitadeScrapper
        
         static ScrapingBrowser _browser = new ScrapingBrowser();
         static string mainUrl = ("https://www.kita.de/");
+
         public Scrapper()
         {
             try
@@ -28,7 +29,6 @@ namespace KitadeScrapper
                 foreach (var link in _mainLinks)
                 {
                     var citiesInOtherPages = GetPages(link, "ol.pagination_char li a"); //scrape all the cities in later pages of a district
-
                     foreach (var currentPage in citiesInOtherPages)
                     {
                         var citiesLink = GetMainPageLinks(currentPage, "ol.cities li a");
@@ -47,19 +47,20 @@ namespace KitadeScrapper
                         _schoolLinks.AddRange(schoolLink);
                         var schoolDet = SchoolDetails.GetPageDetails(schoolLink);
                         _schoolDetail.AddRange(schoolDet);
-                        var exportDataToCSV1 = new ExportDataToCSV(_schoolDetail);
+                        var exportDataToCSV = new ExportDataToCSV(schoolDet);
                         Console.WriteLine(link.ToString());
                     }
                 }
 
-                var exportDataToCSV = new ExportDataToCSV(_schoolDetail);
+
             }
             catch(Exception e)
             {
                 Console.WriteLine(e.ToString());
             }
         }
-        
+
+
         static List<String> GetPages(string url, string queryExpression)
         {
             HashSet<string> homePageLinks = new HashSet<string>();
