@@ -15,7 +15,7 @@ namespace KitadeScrapper
     {
         public ExportDataToCSV(List<SchoolDetails> lstPageDetails)
         {
-            string strFilePath = @"D:\Lenovo Imports\Disk D\VS19 Projects\Data.csv";
+            string strFilePath = Environment.GetEnvironmentVariable("csvRecordsPath");//@"D:\Lenovo Imports\Disk D\VS19 Projects\Data.csv";
 
             // Do not include the header row if the file already exists
             CsvConfiguration csvConfig = new CsvConfiguration(CultureInfo.CurrentCulture)

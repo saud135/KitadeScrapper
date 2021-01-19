@@ -52,12 +52,18 @@ namespace KitadeScrapper
                     pageDetails.PostalCode = arg2[0];
                     pageDetails.City = arg2[1];
 
-                    pageDetails.NumberOfPlaces = ((HtmlAgilityPack.HtmlNode[])htmlNode.OwnerDocument.GetElementbyId("tab-informationen-content").CssSelect("td"))[2].InnerText.ToString(); //F
-                    pageDetails.Type = ((HtmlAgilityPack.HtmlNode[])htmlNode.OwnerDocument.GetElementbyId("profile").CssSelect("h2"))[0].InnerHtml.ToString(); //G
-                    pageDetails.SchoolCommunity = ((HtmlAgilityPack.HtmlNode[])htmlNode.OwnerDocument.GetElementbyId("tab-informationen-content").CssSelect("td"))[0].InnerText.ToString(); //H
+                    pageDetails.NumberOfPlaces = ((HtmlAgilityPack.HtmlNode[])htmlNode.OwnerDocument.GetElementbyId("tab-informationen-content").CssSelect("td"))[2].InnerText.ToString().Replace( "/ ?",""); //F
+                    //pageDetails.NumberOfPlaces =((HtmlAgilityPack.HtmlNode[])htmlNode.OwnerDocument.GetElementbyId("tab-informationen-content").CssSelect("td div.progress-bar div.percentage"))[0].InnerText.ToString().Replace(" / ?", "")
 
-                    //if(htmlNode.OwnerDocument.GetElementbyId("profile").HasClass("www"))
-                    //pageDetails.Url = ((HtmlAgilityPack.HtmlNode[])htmlNode.OwnerDocument.GetElementbyId("profile").CssSelect("p.www"))[0].Attributes["href"].Value;
+
+                    pageDetails.Type = ((HtmlAgilityPack.HtmlNode[])htmlNode.OwnerDocument.GetElementbyId("profile").CssSelect("h2"))[0].InnerHtml.ToString(); //G
+
+                    if (((HtmlAgilityPack.HtmlNode[])htmlNode.OwnerDocument.GetElementbyId("tab-informationen-content").CssSelect("td.traeger")).Length > 0)
+                        pageDetails.SchoolCommunity = ((HtmlAgilityPack.HtmlNode[])htmlNode.OwnerDocument.GetElementbyId("tab-informationen-content").CssSelect("td.traeger"))[0].InnerText.ToString();
+                   // pageDetails.SchoolCommunity = ((HtmlAgilityPack.HtmlNode[])htmlNode.OwnerDocument.GetElementbyId("tab-informationen-content").CssSelect("td"))[0].InnerText.ToString(); //H
+
+                    if (((HtmlAgilityPack.HtmlNode[])htmlNode.OwnerDocument.GetElementbyId("profile").CssSelect("p.www a")).Length > 0)//(htmlNode.OwnerDocument.GetElementbyId("profile").CssSelect("p.www") != null)//(htmlNode.OwnerDocument.GetElementbyId("profile").HasClass("www"))
+                        pageDetails.Url = ((HtmlAgilityPack.HtmlNode[])htmlNode.OwnerDocument.GetElementbyId("profile").CssSelect("p.www a"))[0].Attributes["href"].Value;
 
                     // pageDetails.Url = htmlNode.OwnerDocument.GetElementbyId("profile")
 
