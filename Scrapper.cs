@@ -22,6 +22,7 @@ namespace KitadeScrapper
 
             var _citiesLink = new List<string>();
             var _schoolLinks = new List<string>();
+            var _schoolDetail = new List<SchoolDetails>();
             foreach (var link in _mainLinks)
             {
                 var citiesInOtherPages = GetPages(link, "ol.pagination_char li a");
@@ -36,13 +37,21 @@ namespace KitadeScrapper
 
             foreach (var link in _citiesLink)
             {
-                var schoolLink = GetMainPageLinks(link, "h3 a ");
-                _schoolLinks.AddRange(schoolLink);
-                var schoolDet = SchoolDetails.GetPageDetails(schoolLink);
-                var exportDataToCSV = new ExportDataToCSV(schoolDet);
-                Console.WriteLine(link.ToString());
+                var citiesInOtherPages = GetPages(link, "ol.pagination li a");
+
+                foreach (var currentPage in citiesInOtherPages)
+                {
+                    var schoolLink = GetMainPageLinks(link, "h3 a ");
+                    _schoolLinks.AddRange(schoolLink);
+                    var schoolDet = SchoolDetails.GetPageDetails(schoolLink);
+                    _schoolDetail.AddRange(schoolDet);
+                    Console.WriteLine(link.ToString());
+                }
             }
+            
+            var exportDataToCSV = new ExportDataToCSV(_schoolDetail);
         }
+        
         static List<String> GetPages(string url, string queryExpression)
         {
             HashSet<string> homePageLinks = new HashSet<string>();
